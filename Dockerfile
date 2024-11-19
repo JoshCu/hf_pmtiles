@@ -34,7 +34,7 @@ COPY *.py .
 COPY *.sql .
 
 RUN python3 -m pip install uv --break-system-packages && uv venv && uv pip install pyproj
-RUN uv run hydrolocations_to _geom.py
+RUN uv run hydrolocations_to_geom.py
 
 FROM hydrolocations_to_geom AS ak_to_geojson
 # ak EPSG:3338
@@ -77,7 +77,7 @@ RUN tile-join -pk -o ak.mbtiles flowpaths.mbtiles divides.mbtiles
 FROM gl_to_geojson AS gl_to_mbtiles 
 RUN tippecanoe -z10 -Z7 -o flowpaths.mbtiles -l gl_flowpaths --drop-densest-as-needed --extend-zooms-if-still-dropping flowpaths.geojson -P
 RUN tippecanoe -z10 -Z7 -o divides.mbtiles -l gl_divides --drop-densest-as-needed --extend-zooms-if-still-dropping divides.geojson -P
-RUN tippecanoe -zg -o hydrolocations.mbtiles -l gl_hydrolocations --drop-densest-as-needed --extend-zooms-if-still-dropping hydrolocations.geojson -P
+RUN tippecanoe -z10 -o hydrolocations.mbtiles -l gl_hydrolocations --drop-densest-as-needed --extend-zooms-if-still-dropping hydrolocations.geojson -P
 RUN tile-join -pk -o gl.mbtiles flowpaths.mbtiles divides.mbtiles hydrolocations.mbtiles
 
 FROM hi_to_geojson AS hi_to_mbtiles
@@ -93,7 +93,7 @@ RUN tile-join -pk -o prvi.mbtiles flowpaths.mbtiles divides.mbtiles
 FROM conus_to_geojson AS conus_to_mbtiles
 RUN tippecanoe -z10 -Z7 -o flowpaths.mbtiles -l conus_flowpaths --drop-densest-as-needed --extend-zooms-if-still-dropping flowpaths.geojson -P
 RUN tippecanoe -z10 -Z7 -o divides.mbtiles -l conus_divides --drop-densest-as-needed --extend-zooms-if-still-dropping divides.geojson -P
-RUN tippecanoe -zg -o hydrolocations.mbtiles -l conus_hydrolocations --drop-densest-as-needed --extend-zooms-if-still-dropping hydrolocations.geojson -P
+RUN tippecanoe -z10 -o hydrolocations.mbtiles -l conus_hydrolocations --drop-densest-as-needed --extend-zooms-if-still-dropping hydrolocations.geojson -P
 RUN tile-join -pk -o conus.mbtiles flowpaths.mbtiles divides.mbtiles hydrolocations.mbtiles
 
 FROM install_tools AS merge_mbtiles
